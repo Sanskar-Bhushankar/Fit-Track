@@ -15,17 +15,27 @@ function Payments() {
   const fetchPaymentData = async () => {
     setLoading(true)
     try {
-      // Fetch unpaid members
-      const unpaidResponse = await api.get('/enrollment/unpaid')
-      const formattedUnpaid = unpaidResponse.data.map(member => ({
-        ...member,
-        status: 'pending',
-        formatted_date: new Date(member.month).toLocaleDateString()
-      }))
-      setUnpaidMembers(formattedUnpaid)
+      const enrollmentsResponse = await api.get('/enrollment/unpaid')
+      console.log('Enrollments response:', enrollmentsResponse.data)
+      
+      // Remove duplicates and format the data
+      const uniqueEnrollments = enrollmentsResponse.data.reduce((acc, curr) => {
+        const key = `${curr.email}-${curr.month}`
+        if (!acc[key]) {
+          acc[key] = {
+            ...curr,
+            status: curr.payment_status,
+            formatted_date: new Date(curr.month).toLocaleDateString()
+          }
+        }
+        return acc
+      }, {})
+
+      setUnpaidMembers(Object.values(uniqueEnrollments))
 
       // Fetch outstanding dues
       const duesResponse = await api.get('/enrollment/outstanding-dues')
+      console.log('Dues response:', duesResponse.data)
       setOutstandingDues(duesResponse.data)
       setMessage('')
     } catch (error) {
@@ -39,12 +49,12 @@ function Payments() {
   // Filter payments based on active tab
   const getDisplayedPayments = () => {
     switch(activeTab) {
-      case 'unpaid':
-        return unpaidMembers
       case 'paid':
-        return [] // Currently we don't have paid data from backend
+        return unpaidMembers.filter(payment => payment.payment_status === 'paid')
+      case 'unpaid':
+        return unpaidMembers.filter(payment => payment.payment_status === 'pending')
       default:
-        return unpaidMembers // Showing all available data
+        return unpaidMembers
     }
   }
 
@@ -122,10 +132,10 @@ function Payments() {
                     <td style={styles.td}>
                       <span style={{
                         ...styles.status,
-                        backgroundColor: payment.status === 'paid' ? '#dcfce7' : '#fef3c7',
-                        color: payment.status === 'paid' ? '#166534' : '#92400e'
+                        backgroundColor: payment.payment_status === 'paid' ? '#dcfce7' : '#fef3c7',
+                        color: payment.payment_status === 'paid' ? '#166534' : '#92400e'
                       }}>
-                        {payment.status}
+                        {payment.payment_status}
                       </span>
                     </td>
                     <td style={styles.td}>{payment.formatted_date}</td>

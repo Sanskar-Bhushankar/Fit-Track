@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Register from './pages/Register'
 import Payments from './pages/Payments'
+import ChangeBatch from './pages/ChangeBatch'
 import Navbar from './components/Navbar'
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/payments" element={<Payments />} />
+            <Route path="/change-batch" element={<ChangeBatch />} />
           </Routes>
         </main>
       </div>

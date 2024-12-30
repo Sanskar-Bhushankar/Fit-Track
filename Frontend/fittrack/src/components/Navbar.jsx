@@ -8,6 +8,7 @@ function Navbar() {
         <div style={styles.links}>
           <Link to="/" style={styles.link}>Home</Link>
           <Link to="/register" style={styles.link}>Register for Batch</Link>
+          <Link to="/change-batch" style={styles.link}>Change Batch</Link>
           <Link to="/payments" style={styles.link}>Payment Status</Link>
         </div>
       </div>
